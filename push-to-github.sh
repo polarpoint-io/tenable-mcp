@@ -30,12 +30,17 @@ git rev-parse --verify "${BRANCH}" >/dev/null 2>&1 \
   || die "Branch '${BRANCH}' does not exist locally."
 
 # 1. SSH auth check
+# `ssh -T git@github.com` always exits 1 (GitHub never grants a shell), so we
+# capture output and grep for the success banner instead of relying on $?.
 log "Checking SSH access to github.com..."
-if ! ssh -T -o BatchMode=yes -o StrictHostKeyChecking=accept-new git@github.com 2>&1 \
-     | grep -qE "successfully authenticated|Hi .*!"; then
-  die "SSH auth to github.com failed. Add your public key at https://github.com/settings/keys and retry."
+ssh_output=$(ssh -T -o BatchMode=yes -o StrictHostKeyChecking=accept-new git@github.com 2>&1 || true)
+if printf '%s\n' "$ssh_output" | grep -qE "successfully authenticated|Hi .*!"; then
+  who=$(printf '%s\n' "$ssh_output" | sed -nE 's/^Hi ([^!]+)!.*/\1/p')
+  log "SSH auth OK${who:+ (as ${who})}."
+else
+  printf '%s\n' "$ssh_output" >&2
+  die "SSH auth to github.com failed. Try 'ssh-add ~/.ssh/id_ed25519' (or whichever key is registered with GitHub) and re-run."
 fi
-log "SSH auth OK."
 
 # 2. gh availability + auth check (used to create the repo under the org)
 if ! command -v gh >/dev/null 2>&1; then

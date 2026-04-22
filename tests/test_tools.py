@@ -20,7 +20,7 @@ def test_list_scans(get_client):
     scans_api.list.return_value = iter([{"id": 1, "name": "Daily"}])
     get_client.return_value = _mock_tio(scans=scans_api)
 
-    result = server.list_scans.fn()
+    result = server.list_scans()
     assert result["count"] == 1
     assert result["scans"][0]["id"] == 1
 
@@ -31,7 +31,7 @@ def test_launch_scan(get_client):
     scans_api.launch.return_value = "abc-123"
     get_client.return_value = _mock_tio(scans=scans_api)
 
-    result = server.launch_scan.fn(scan_id=42, targets=["10.0.0.1"])
+    result = server.launch_scan(scan_id=42, targets=["10.0.0.1"])
     assert result == {"scan_id": 42, "scan_uuid": "abc-123"}
     scans_api.launch.assert_called_once_with(42, targets=["10.0.0.1"])
 
@@ -42,7 +42,7 @@ def test_get_plugin_info(get_client):
     plugins_api.plugin_details.return_value = {"id": 19506, "name": "Nessus Scan Info"}
     get_client.return_value = _mock_tio(plugins=plugins_api)
 
-    result = server.get_plugin_info.fn(plugin_id=19506)
+    result = server.get_plugin_info(plugin_id=19506)
     assert result["id"] == 19506
 
 
@@ -52,6 +52,6 @@ def test_error_surfaces_cleanly(get_client):
     scans_api.list.side_effect = RuntimeError("boom")
     get_client.return_value = _mock_tio(scans=scans_api)
 
-    result = server.list_scans.fn()
+    result = server.list_scans()
     assert result["error"] == "RuntimeError"
     assert "boom" in result["message"]
