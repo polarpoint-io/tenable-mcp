@@ -4,6 +4,7 @@ A Model Context Protocol (MCP) server that exposes [Tenable.io](https://www.tena
 
 Ask an LLM things like "which of our assets have a critical CVE disclosed in the last 30 days?", "summarise the latest scan for the production network", or "launch the quarterly compliance scan against 10.0.0.0/24" — and the LLM can answer by calling Tenable.io directly through this server.
 
+> **PyPI**: `pip install pytenable-mcp`
 > **Image**: `ghcr.io/polarpoint-io/tenable-mcp:latest`
 > **Repo**: https://github.com/polarpoint-io/tenable-mcp
 
@@ -25,7 +26,20 @@ Ask an LLM things like "which of our assets have a critical CVE disclosed in the
 
 ## Quick start
 
-Pull the prebuilt image and run it in stdio mode from any MCP-capable client:
+Three ways to run it — pick whichever fits your setup.
+
+### 1. pip (no Docker)
+
+```bash
+pip install pytenable-mcp
+export TIO_ACCESS_KEY=your_access_key
+export TIO_SECRET_KEY=your_secret_key
+
+pytenable-mcp                                    # stdio
+TRANSPORT=http HTTP_PORT=8000 pytenable-mcp      # HTTP/SSE
+```
+
+### 2. Docker (stdio, launched by your MCP client)
 
 ```bash
 docker pull ghcr.io/polarpoint-io/tenable-mcp:latest
@@ -36,7 +50,7 @@ docker run --rm -i \
   ghcr.io/polarpoint-io/tenable-mcp:latest
 ```
 
-Or run it as a standalone HTTP/SSE service:
+### 3. Docker (HTTP/SSE, standalone service)
 
 ```bash
 docker run --rm \
@@ -83,6 +97,22 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) o
         "-e", "TIO_SECRET_KEY",
         "ghcr.io/polarpoint-io/tenable-mcp:latest"
       ],
+      "env": {
+        "TIO_ACCESS_KEY": "your_access_key",
+        "TIO_SECRET_KEY": "your_secret_key"
+      }
+    }
+  }
+}
+```
+
+Or, if you'd rather skip Docker and use the pip-installed binary:
+
+```json
+{
+  "mcpServers": {
+    "tenable": {
+      "command": "pytenable-mcp",
       "env": {
         "TIO_ACCESS_KEY": "your_access_key",
         "TIO_SECRET_KEY": "your_secret_key"

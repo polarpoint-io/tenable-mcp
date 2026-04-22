@@ -124,9 +124,26 @@ This server talks to a sensitive security system. Keep it that way:
 
 ## Release flow
 
-1. Bump version in `pyproject.toml` and `src/pytenable_mcp/__init__.py`.
-2. Update `CHANGELOG.md` (`## [x.y.z] - YYYY-MM-DD`).
-3. Commit, tag `vX.Y.Z`, push the tag — CI will build and push `ghcr.io/polarpoint-io/tenable-mcp:X.Y.Z`, `:X.Y`, and retag `:latest` on `main`.
+Releases are **automated** by [semantic-release](https://github.com/semantic-release/semantic-release) on every push to `main`. There is no manual version-bumping step.
+
+**What you need to do: write commit messages in [Conventional Commits](https://www.conventionalcommits.org/) format.** The commit subject determines whether (and how) a release is cut:
+
+| Commit prefix | Release bump | Example |
+|---------------|--------------|---------|
+| `fix:` | patch (0.1.0 → 0.1.1) | `fix: handle empty filter list in list_vulnerabilities` |
+| `feat:` | minor (0.1.0 → 0.2.0) | `feat: add list_remediation_scans tool` |
+| `feat!:` or `BREAKING CHANGE:` in body | major (0.1.0 → 1.0.0) | `feat!: rename TIO_URL to TENABLE_URL` |
+| `chore:`, `docs:`, `refactor:`, `test:`, `ci:`, `style:` | no release | |
+
+On a push to `main` with a releasable commit, CI will:
+
+1. Compute the next version from the commit history.
+2. Update `pyproject.toml` version and prepend the release notes to `CHANGELOG.md`.
+3. Build the sdist + wheel and `twine upload` to PyPI.
+4. Create the GitHub release with the artefacts attached.
+5. Push a `vX.Y.Z` git tag — which triggers a second CI run that publishes `ghcr.io/polarpoint-io/tenable-mcp:X.Y.Z` / `:X.Y` / `:latest`.
+
+`__version__` in `src/pytenable_mcp/__init__.py` is derived from `importlib.metadata`, so it tracks `pyproject.toml` automatically — don't hand-edit it.
 
 ## What to do when things are unclear
 
