@@ -1,0 +1,16 @@
+services:
+  pytenable-mcp:
+    build: .
+    image: pytenable-mcp:latest
+    container_name: pytenable-mcp
+    restart: unless-stopped
+    environment:
+      TIO_ACCESS_KEY: ${TIO_ACCESS_KEY}
+      TIO_SECRET_KEY: ${TIO_SECRET_KEY}
+      TIO_URL: ${TIO_URL:-https://cloud.tenable.com}
+      TRANSPORT: ${TRANSPORT:-http}
+      HTTP_HOST: 0.0.0.0
+      HTTP_PORT: "8000"
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    ports:
+      - "${HTTP_PORT:-8000}:8000"
