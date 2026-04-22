@@ -1,3 +1,11 @@
+# 1.0.0 (2026-04-22)
+
+
+### Features
+
+* publish to PyPI via semantic-release ([55705f4](https://github.com/polarpoint-io/tenable-mcp/commit/55705f4ecfb4a9042122e8c5bb8f06b430375a8b))
+* trigger initial release pipeline ([577d02b](https://github.com/polarpoint-io/tenable-mcp/commit/577d02bcfc99d61650b892bff940e35b8783150b))
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
